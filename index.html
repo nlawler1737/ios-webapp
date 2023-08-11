@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>redir</title>
+        <style>
+            * {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            body {
+                margin: 0;
+            }
+            main {
+                background-color: #ffffff57;
+                width: max-content;
+                padding: 10px;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <strong
+                >Workaround For IOS Removal of "data:text/html" Web Apps</strong
+            >
+            <ul>
+                <li>Enter base64 of HTML</li>
+                <li>Select background color of your app</li>
+                <li>Push "Redirect"</li>
+            </ul>
+            <p>
+                Once pushed add this page to your home screen. Everything will
+                take affect once it is a web app
+            </p>
+            <br />
+            <div>
+                <label for="base64-content">Base64 HTML</label>
+                <input
+                    id="base64-content"
+                    type="text"
+                    placeholder="base64"
+                    name="base64-content"
+                />
+            </div>
+            <div>
+                <label for="color-input">Background</label>
+                <input type="color" id="color-input" name="color-input" />
+            </div>
+            <button id="redirect-btn">Redirect</button>
+        </main>
+        <script>
+            const redirectBtn = document.querySelector("#redirect-btn");
+            const base64Content = document.querySelector("#base64-content");
+            const colorInput = document.querySelector("#color-input");
+
+            const params = new URLSearchParams(window.location.search);
+            const bg = params.get("background");
+            const base64 = params.get("base64");
+
+            if (bg) {
+                colorInput.value = bg;
+                document.body.style.background = bg;
+            }
+            if (base64) {
+                base64Content.value = base64;
+            }
+            if (false || "standalone" in window.navigator) {
+                const base64 = atob(params.get("base64"));
+                window.onload = function () {
+                    document.open();
+                    document.write(base64);
+                    document.close();
+                };
+            } else {
+                document.querySelector("main").style.display = "block";
+            }
+
+            redirectBtn.onclick = function (btn) {
+                if (!base64Content.value) return;
+                const params = new URLSearchParams();
+                params.set("base64", base64Content.value.trim());
+                params.set("background", colorInput.value);
+                const url = new URL(
+                    window.location.origin + window.location.pathname
+                );
+                url.search = params;
+                window.location.href = url.href;
+            };
+        </script>
+    </body>
+</html>
