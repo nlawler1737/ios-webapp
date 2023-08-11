@@ -82,12 +82,12 @@
         </main>
         <script>
             const saveBtn = document.querySelector("#redirect-btn");
-            const base64Content = document.querySelector("#base64-content");
+            const base64Input = document.querySelector("#base64-content");
             const colorInput = document.querySelector("#color-input");
             const appIconUrl = document.querySelector("#appIcon-url");
-            const appIconInput = document.querySelector("#appIcon-input");
-            const appIcon = document.querySelector("#appIcon");
-            const appleIcon = document.querySelector("#apple-icon");
+            const appIconFile = document.querySelector("#appIcon-input");
+            const appIconImg = document.querySelector("#appIcon");
+            const appleIconMeta = document.querySelector("#apple-icon");
 
             class Params {
                 #params;
@@ -131,37 +131,8 @@
             }
 
             const params = new Params(window.location.hash);
-            const { base64, background, icon } = params.object;
 
-            let iconData = "";
-
-            appIconUrl.addEventListener(
-                "change",
-                function (e) {
-                    iconData = appIconUrl.value;
-                    appIcon.src = appIconUrl.value;
-                },
-                false
-            );
-
-            appIconInput.addEventListener("change", handleFileSelect, false);
-
-            if (background) {
-                colorInput.value = background;
-                document.body.style.background = background;
-                document
-                    .querySelector("[name='theme-color']")
-                    .setAttribute("content", background);
-            }
-
-            if (base64) {
-                base64Content.value = base64;
-            }
-
-            if (icon) {
-                appIcon.src = icon;
-                appleIcon.href = icon;
-            }
+            displayInformation();
 
             if (
                 "standalone" in window.navigator &&
@@ -177,14 +148,67 @@
                 document.querySelector("main").style.display = "block";
             }
 
-            saveBtn.onclick = function (btn) {
-                if (!base64Content.value) return;
-                const params = new Params();
-                const icon = params.get("icon");
+            base64Input.addEventListener("change", function () {
+                params.set("base64", base64Input.value);
+            });
+
+            colorInput.addEventListener("change", function () {
                 params.set("background", colorInput.value);
-                if (iconData) params.set("icon", iconData);
-                params.set("base64", base64Content.value.trim());
+                update_background(colorInput.value);
+            });
+
+            appIconUrl.addEventListener(
+                "change",
+                function (e) {
+                    params.set("icon", appIconUrl.value);
+                    update_icon(appIconUrl.value);
+                },
+                false
+            );
+
+            appIconFile.addEventListener("change", handleFileSelect, false);
+
+            saveBtn.onclick = function (btn) {
+                if (!base64Input.value) return;
+                displayInformation();
+                update_url();
             };
+
+            function displayInformation() {
+                const base64 = params.get("base64");
+                const background = params.get("background");
+                const icon = params.get("icon");
+
+                update_base64(base64);
+
+                update_background(background);
+
+                update_icon(icon);
+            }
+
+            function update_background(background) {
+                const color = colorInput.value;
+
+                colorInput.value = background || color;
+                document.body.style.background = background || color;
+                document
+                    .querySelector("[name='theme-color']")
+                    .setAttribute("content", background || color);
+            }
+
+            function update_url() {
+                window.location.hash = params.hash;
+            }
+
+            function update_icon(icon) {
+                appIconImg.src = icon;
+                appleIconMeta.href = icon;
+                appIconUrl.value = icon?.match(/^https?/) ? icon : "";
+            }
+
+            function update_base64(base64) {
+                base64Input.value = base64 || "";
+            }
 
             function handleFileSelect(event) {
                 const selectedFile = event.target.files[0];
@@ -205,8 +229,8 @@
                                 );
                                 return;
                             }
-                            appIcon.src = src;
-                            iconData = src;
+                            params.set("icon", src);
+                            update_icon(src);
                         };
                     };
 
