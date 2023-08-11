@@ -3,11 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>redir</title>
+        <title>Web App Creator</title>
         <meta http-equiv="content-Type" content="text/html; charset=utf-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
-        <title>Schedules</title>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="rgb(50, 50, 50)" />
         <meta
@@ -15,6 +14,7 @@
             content="width=320, initial-scale=1,user-scaleable=no"
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link id="apple-icon" rel="apple-touch-icon" sizes="180x180" href="" />
         <style>
             * {
                 font-family: Arial, Helvetica, sans-serif;
@@ -33,7 +33,7 @@
     <body>
         <main>
             <strong
-                >Workaround For IOS Removal of "data:text/html" Web Apps</strong
+                >Workaround For iOS Removal of "data:text/html" Web Apps</strong
             >
             <ul>
                 <li>Enter base64 of HTML</li>
@@ -41,8 +41,8 @@
                 <li>Push "Redirect"</li>
             </ul>
             <p>
-                Once pushed add this page to your home screen. Everything will
-                take affect once it is a web app
+                Once pushed, add this page to your home screen. Everything will
+                take effect once it is a web app
             </p>
             <br />
             <div>
@@ -58,25 +58,76 @@
                 <label for="color-input">Background</label>
                 <input type="color" id="color-input" name="color-input" />
             </div>
+            <div>
+                <label for="color-input">App Icon</label>
+                <div>
+                    <input
+                        type="file"
+                        name="appIcon-input"
+                        id="appIcon-input"
+                    />
+                    <br />or
+                    <br />
+                    <input
+                        type="url"
+                        name=""
+                        id="appIcon-url"
+                        placeholder="Image URL"
+                    />
+                </div>
+                <br />
+                <img id="appIcon" width="150" src="" alt="App Icon..." />
+            </div>
             <button id="redirect-btn">Redirect</button>
         </main>
         <script>
             const redirectBtn = document.querySelector("#redirect-btn");
             const base64Content = document.querySelector("#base64-content");
             const colorInput = document.querySelector("#color-input");
+            const appIconUrl = document.querySelector("#appIcon-url");
+            const appIconInput = document.querySelector("#appIcon-input");
+            const appIcon = document.querySelector("#appIcon");
+            const appleIcon = document.querySelector("#apple-icon");
 
             const params = new URLSearchParams(window.location.search);
             const bg = params.get("background");
             const base64 = params.get("base64");
+            const icon = params.get("icon");
+
+            let iconData = "";
+
+            appIconUrl.addEventListener(
+                "change",
+                function (e) {
+                    iconData = "url|" + appIconUrl.value;
+                    appIcon.src = appIconUrl.value;
+                },
+                false
+            );
+
+            appIconInput.addEventListener("change", handleFileSelect, false);
 
             if (bg) {
                 colorInput.value = bg;
                 document.body.style.background = bg;
+                document
+                    .querySelector("[name='theme-color']")
+                    .setAttribute("content", bg);
             }
+
             if (base64) {
                 base64Content.value = base64;
             }
-            if ("standalone" in window.navigator && window.navigator.standalone) {
+
+            if (icon) {
+                appIcon.src = icon.split("|")[1];
+                appleIcon.href = icon.split("|")[1];
+            }
+
+            if (
+                "standalone" in window.navigator &&
+                window.navigator.standalone
+            ) {
                 const base64 = atob(params.get("base64"));
                 window.onload = function () {
                     document.open();
@@ -92,12 +143,41 @@
                 const params = new URLSearchParams();
                 params.set("base64", base64Content.value.trim());
                 params.set("background", colorInput.value);
+                params.set("icon", iconData);
                 const url = new URL(
                     window.location.origin + window.location.pathname
                 );
                 url.search = params;
                 window.location.href = url.href;
             };
+
+            function handleFileSelect(event) {
+                const selectedFile = event.target.files[0];
+
+                if (selectedFile) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (event) {
+                        const img = new Image();
+                        const src = event.target.result;
+
+                        img.src = src;
+                        img.onload = function () {
+                            const { width, height } = img;
+                            if (width > 200 || height > 200) {
+                                alert(
+                                    "Image must be 200x200 pixels or less. Or use a URL"
+                                );
+                                return;
+                            }
+                            appIcon.src = src;
+                            iconData = "base64|" + src;
+                        };
+                    };
+
+                    reader.readAsDataURL(selectedFile);
+                }
+            }
         </script>
     </body>
 </html>
