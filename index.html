@@ -38,10 +38,10 @@
             <ul>
                 <li>Enter base64 of HTML</li>
                 <li>Select background color of your app</li>
-                <li>Push "Redirect"</li>
+                <li>Push "Save"</li>
             </ul>
             <p>
-                Once pushed, add this page to your home screen. Everything will
+                Once saved, add this page to your home screen. Everything will
                 take effect once it is a web app
             </p>
             <br />
@@ -78,10 +78,10 @@
                 <br />
                 <img id="appIcon" width="150" src="" alt="App Icon..." />
             </div>
-            <button id="redirect-btn">Redirect</button>
+            <button id="redirect-btn">Save</button>
         </main>
         <script>
-            const redirectBtn = document.querySelector("#redirect-btn");
+            const saveBtn = document.querySelector("#redirect-btn");
             const base64Content = document.querySelector("#base64-content");
             const colorInput = document.querySelector("#color-input");
             const appIconUrl = document.querySelector("#appIcon-url");
@@ -89,17 +89,56 @@
             const appIcon = document.querySelector("#appIcon");
             const appleIcon = document.querySelector("#apple-icon");
 
-            const params = new URLSearchParams(window.location.search);
-            const bg = params.get("background");
-            const base64 = params.get("base64");
-            const icon = params.get("icon");
+            class Params {
+                #params;
+                #split_entry = "~.~";
+                #split_keyvalue = "~-~";
+                constructor(hash) {
+                    this.#params = hash
+                        ? hash
+                              .replace(/^#/, "")
+                              .split(this.#split_entry)
+                              .map((a) => a.split(this.#split_keyvalue))
+                              .reduce((a, b) => {
+                                  a[b[0]] = decodeURIComponent(b[1]);
+                                  return a;
+                              }, {})
+                        : {};
+                    return this;
+                }
+                set(key, value) {
+                    this.#params[key] = value;
+                    window.location.hash = this.hash;
+                    return;
+                }
+                get(key) {
+                    return this.#params[key];
+                }
+                get object() {
+                    return { ...this.#params };
+                }
+                get hash() {
+                    return (
+                        "#" +
+                        Object.entries(this.#params)
+                            .map((a) => {
+                                a[1] = encodeURIComponent(a[1]);
+                                return a.join(this.#split_keyvalue);
+                            })
+                            .join(this.#split_entry)
+                    );
+                }
+            }
+
+            const params = new Params(window.location.hash);
+            const { base64, background, icon } = params.object;
 
             let iconData = "";
 
             appIconUrl.addEventListener(
                 "change",
                 function (e) {
-                    iconData = "url|" + appIconUrl.value;
+                    iconData = appIconUrl.value;
                     appIcon.src = appIconUrl.value;
                 },
                 false
@@ -107,12 +146,12 @@
 
             appIconInput.addEventListener("change", handleFileSelect, false);
 
-            if (bg) {
-                colorInput.value = bg;
-                document.body.style.background = bg;
+            if (background) {
+                colorInput.value = background;
+                document.body.style.background = background;
                 document
                     .querySelector("[name='theme-color']")
-                    .setAttribute("content", bg);
+                    .setAttribute("content", background);
             }
 
             if (base64) {
@@ -120,8 +159,8 @@
             }
 
             if (icon) {
-                appIcon.src = icon.split("|")[1];
-                appleIcon.href = icon.split("|")[1];
+                appIcon.src = icon;
+                appleIcon.href = icon;
             }
 
             if (
@@ -138,17 +177,13 @@
                 document.querySelector("main").style.display = "block";
             }
 
-            redirectBtn.onclick = function (btn) {
+            saveBtn.onclick = function (btn) {
                 if (!base64Content.value) return;
-                const params = new URLSearchParams();
-                params.set("base64", base64Content.value.trim());
+                const params = new Params();
+                const icon = params.get("icon");
                 params.set("background", colorInput.value);
-                params.set("icon", iconData);
-                const url = new URL(
-                    window.location.origin + window.location.pathname
-                );
-                url.search = params;
-                window.location.href = url.href;
+                if (iconData) params.set("icon", iconData);
+                params.set("base64", base64Content.value.trim());
             };
 
             function handleFileSelect(event) {
@@ -171,7 +206,7 @@
                                 return;
                             }
                             appIcon.src = src;
-                            iconData = "base64|" + src;
+                            iconData = src;
                         };
                     };
 
