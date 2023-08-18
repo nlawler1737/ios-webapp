@@ -98,10 +98,13 @@
                     <li>Click "Add to Home Screen"</li>
                 </ul>
 
-                <small
-                    >*background color should be the background color of loaded
-                    html</small
-                >
+                <small>
+                    <div>
+                        * background color should be the background color of
+                        loaded html
+                    </div>
+                    <div>* pasted html will be converted to base64</div>
+                </small>
             </div>
             <div class="input-group">
                 <label for="title-input" id="title-label" class="w-100"
@@ -118,7 +121,7 @@
             <div class="input-group">
                 <label id="base64-label" class="w-100" for="html-file-input"
                     >HTML<small
-                        >from file or paste base64 encoded HTML</small
+                        >from file or paste HTML / base64 HTML</small
                     ></label
                 >
                 <input
@@ -131,7 +134,7 @@
                     id="base64-input"
                     class="w-100"
                     type="text"
-                    placeholder="Base64"
+                    placeholder="Base64 / HTML"
                     name="base64-input"
                 ></textarea>
             </div>
@@ -215,6 +218,7 @@
                     return (
                         "#" +
                         Object.entries(this.#params)
+                            .filter((a) => a[1])
                             .map((a) => {
                                 a[1] = encodeURIComponent(a[1]);
                                 return a.join(this.#split_keyvalue);
@@ -264,7 +268,14 @@
             );
 
             addHomeBtn.addEventListener("click", async function () {
-                navigator.share(window.location.href);
+                navigator
+                    .share(window.location.href)
+                    .then(() => {
+                        console.log("Shared Successfully");
+                    })
+                    .catch((e) => {
+                        console.error("Error: " + e);
+                    });
             });
 
             saveBtn.onclick = handle_saveButton;
@@ -295,6 +306,7 @@
             }
 
             function update_title(title) {
+                if (!title) return;
                 titleInput.value = title;
                 appleTitleMeta.setAttribute("content", title);
             }
@@ -336,11 +348,11 @@
             }
 
             function handle_base64Input(event) {
-                if (base64Input.value && !isBase64(base64Input.value)) {
-                    alert("Input is not valid base64");
-                    return;
-                }
-                params.set("base64", base64Input.value);
+                const base64 = isBase64(base64Input.value)
+                    ? base64Input.value
+                    : btoa(base64Input.value);
+                params.set("base64", base64);
+                update_base64(base64);
             }
 
             function handle_htmlFileSelect(event) {
