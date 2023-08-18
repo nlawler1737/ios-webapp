@@ -15,12 +15,22 @@
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link id="apple-icon" rel="apple-touch-icon" sizes="180x180" href="" />
+        <meta
+            id="apple-title"
+            name="apple-mobile-web-app-title"
+            content="My Web App"
+        />
         <style>
             * {
-                font-family: Arial, Helvetica, sans-serif;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+                    "Helvetica Neue", sans-serif;
+                box-sizing: border-box;
             }
             body {
                 margin: 0;
+                display: flex;
+                justify-content: center;
             }
             main {
                 background-color: #ffffff57;
@@ -28,66 +38,150 @@
                 padding: 10px;
                 display: none;
             }
+            #info {
+                border: 1px solid;
+            }
+            #base64-input {
+                resize: none;
+                border-radius: 5px;
+                border: transparent;
+                outline: transparent;
+            }
+            #appIcon {
+                max-width: 150px;
+                max-height: 150px;
+            }
+            #appIcon[src=""] {
+                display: none;
+            }
+            label > small {
+                font-weight: initial;
+                margin-left: 10px;
+            }
+            label {
+                font-weight: 600;
+            }
+            input[type="text"],
+            input[type="url"] {
+                border-radius: 5px;
+                border: 1px solid grey;
+                outline: transparent;
+            }
+            .center-text {
+                text-align: center;
+            }
+            .w-100 {
+                display: block;
+                width: 100%;
+            }
+            .input-group {
+                margin: 10px 0 10px 0;
+            }
+            .hidden {
+                display: none;
+            }
         </style>
     </head>
     <body>
         <main>
-            <strong
-                >Workaround For iOS Removal of "data:text/html" Web Apps</strong
+            <h1 class="center-text">IOS Web App Creator</h1>
+            <span class="w-100 center-text"
+                ><button id="toggle-info-btn">Show Info</button></span
             >
-            <ul>
-                <li>Enter base64 of HTML</li>
-                <li>Select background color of your app</li>
-                <li>Push "Save"</li>
-            </ul>
-            <p>
-                Once saved, add this page to your home screen. Everything will
-                take effect once it is a web app
-            </p>
-            <br />
-            <div>
-                <label for="base64-content">Base64 HTML</label>
+            <div id="info" class="w-10 hidden" style="padding: 5px">
+                <strong class="w-100 center-text"
+                    >Allows Custom HTML Apps On Home Screen</strong
+                >
+                <ul>
+                    <li>Fill out fields</li>
+                    <li>Share Website</li>
+                    <li>Click "Add to Home Screen"</li>
+                </ul>
+
+                <small
+                    >*background color should be the background color of loaded
+                    html</small
+                >
+            </div>
+            <div class="input-group">
+                <label for="title-input" id="title-label" class="w-100"
+                    >App Name</label
+                >
                 <input
-                    id="base64-content"
                     type="text"
-                    placeholder="base64"
-                    name="base64-content"
+                    id="title-input"
+                    name="title-input"
+                    placeholder="App Name"
+                    value="My Web App"
                 />
             </div>
-            <div>
-                <label for="color-input">Background</label>
-                <input type="color" id="color-input" name="color-input" />
+            <div class="input-group">
+                <label id="base64-label" class="w-100" for="html-file-input"
+                    >HTML<small
+                        >from file or paste base64 encoded HTML</small
+                    ></label
+                >
+                <input
+                    id="html-file-input"
+                    type="file"
+                    name="html-file-input"
+                    accept=".html"
+                />
+                <textarea
+                    id="base64-input"
+                    class="w-100"
+                    type="text"
+                    placeholder="Base64"
+                    name="base64-input"
+                ></textarea>
             </div>
             <div>
-                <label for="color-input">App Icon</label>
+                <label class="w-100" for="color-input">Background Color</label>
+                <input
+                    class=""
+                    type="color"
+                    id="color-input"
+                    name="color-input"
+                />
+            </div>
+            <div class="input-group">
+                <label class="w-100" for="appIcon-input"
+                    >App Icon<small>from file or link</small></label
+                >
                 <div>
                     <input
                         type="file"
                         name="appIcon-input"
                         id="appIcon-input"
                     />
-                    <br />or
-                    <br />
                     <input
                         type="url"
+                        class="w-100"
                         name=""
                         id="appIcon-url"
                         placeholder="Image URL"
+                        value="https://apple.com/favicon.ico"
                     />
                 </div>
-                <br />
-                <img id="appIcon" width="150" src="" alt="App Icon..." />
+                <img id="appIcon" src="" />
             </div>
             <button id="redirect-btn">Save</button>
+            <button id="add-to-home-btn">Add To Home Screen</button>
         </main>
         <script>
+            const infoBtn = document.querySelector("#toggle-info-btn");
+            const infoText = document.querySelector("#info");
+            const addHomeBtn = document.querySelector("#add-to-home-btn");
             const saveBtn = document.querySelector("#redirect-btn");
-            const base64Input = document.querySelector("#base64-content");
+            const titleInput = document.querySelector("#title-input");
+            const htmlFile = document.querySelector("#html-file-input");
+            const base64Input = document.querySelector("#base64-input");
             const colorInput = document.querySelector("#color-input");
             const appIconUrl = document.querySelector("#appIcon-url");
             const appIconFile = document.querySelector("#appIcon-input");
             const appIconImg = document.querySelector("#appIcon");
             const appleIconMeta = document.querySelector("#apple-icon");
+            const appleTitleMeta = document.querySelector("#apple-title");
 
             class Params {
                 #params;
@@ -148,42 +242,46 @@
                 document.querySelector("main").style.display = "block";
             }
 
-            base64Input.addEventListener("change", function () {
-                params.set("base64", base64Input.value);
-            });
+            if (!("share" in window.navigator))
+                addHomeBtn.style.display = "none";
 
-            colorInput.addEventListener("change", function () {
-                params.set("background", colorInput.value);
-                update_background(colorInput.value);
-            });
+            infoBtn.addEventListener("click", handle_infoBtnClick, false);
 
-            appIconUrl.addEventListener(
+            titleInput.addEventListener("change", handle_titleInput, false);
+
+            htmlFile.addEventListener("change", handle_htmlFileSelect, false);
+
+            base64Input.addEventListener("change", handle_base64Input, false);
+
+            colorInput.addEventListener("change", handle_colorInput, false);
+
+            appIconUrl.addEventListener("change", handle_urlInput, false);
+
+            appIconFile.addEventListener(
                 "change",
-                function (e) {
-                    params.set("icon", appIconUrl.value);
-                    update_icon(appIconUrl.value);
-                },
+                handle_iconFileSelect,
                 false
             );
 
-            appIconFile.addEventListener("change", handleFileSelect, false);
+            addHomeBtn.addEventListener("click", async function () {
+                navigator.share(window.location.href);
+            });
 
-            saveBtn.onclick = function (btn) {
-                if (!base64Input.value) return;
-                displayInformation();
-                update_url();
-            };
+            saveBtn.onclick = handle_saveButton;
 
             function displayInformation() {
                 const base64 = params.get("base64");
                 const background = params.get("background");
                 const icon = params.get("icon");
+                const title = params.get("title");
 
                 update_base64(base64);
 
                 update_background(background);
 
                 update_icon(icon);
+
+                update_title(title);
             }
 
             function update_background(background) {
@@ -196,21 +294,81 @@
                     .setAttribute("content", background || color);
             }
 
+            function update_title(title) {
+                titleInput.value = title;
+                appleTitleMeta.setAttribute("content", title);
+            }
+
             function update_url() {
                 window.location.hash = params.hash;
             }
 
             function update_icon(icon) {
-                appIconImg.src = icon;
-                appleIconMeta.href = icon;
+                appIconImg.src = icon ? icon : "";
                 appIconUrl.value = icon?.match(/^https?/) ? icon : "";
+                appleIconMeta.href = icon;
             }
 
             function update_base64(base64) {
                 base64Input.value = base64 || "";
             }
 
-            function handleFileSelect(event) {
+            function handle_infoBtnClick(event) {
+                const isHidden = infoText.classList.contains("hidden");
+
+                if (isHidden) {
+                    infoText.classList.remove("hidden");
+                    infoBtn.innerText = "Hide Info";
+                    return;
+                }
+                infoText.classList.add("hidden");
+                infoBtn.innerText = "Show Info";
+            }
+
+            function handle_colorInput(event) {
+                params.set("background", colorInput.value);
+                update_background(colorInput.value);
+            }
+
+            function handle_titleInput(event) {
+                params.set("title", titleInput.value);
+                update_title(titleInput.value);
+            }
+
+            function handle_base64Input(event) {
+                if (base64Input.value && !isBase64(base64Input.value)) {
+                    alert("Input is not valid base64");
+                    return;
+                }
+                params.set("base64", base64Input.value);
+            }
+
+            function handle_htmlFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.readAsText(file, "utf-8");
+                    reader.onload = function (a) {
+                        const text = a.target.result.trim();
+                        const base64 = btoa(text);
+                        params.set("base64", base64);
+                        update_base64(base64);
+                    };
+                }
+            }
+
+            function handle_urlInput(event) {
+                params.set("icon", appIconUrl.value);
+                update_icon(appIconUrl.value);
+            }
+
+            function handle_saveButton(event) {
+                if (!base64Input.value) return;
+                displayInformation();
+                update_url();
+            }
+
+            function handle_iconFileSelect(event) {
                 const selectedFile = event.target.files[0];
 
                 if (selectedFile) {
@@ -236,6 +394,13 @@
 
                     reader.readAsDataURL(selectedFile);
                 }
+            }
+
+            function isBase64(text) {
+                if (text === "") return false;
+                const regex =
+                    /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
+                return regex.test(text);
             }
         </script>
     </body>
