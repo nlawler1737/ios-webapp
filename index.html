@@ -104,7 +104,7 @@
                         loaded html
                     </div>
                     <div>* pasted html will be converted to base64</div>
-                    <div style="text-align: right;">v 2.0</div>
+                    <div style="text-align: right">v 2.0.1</div>
                 </small>
             </div>
             <div class="input-group">
@@ -170,12 +170,10 @@
                 <img id="appIcon" src="" />
             </div>
             <button id="redirect-btn">Save</button>
-            <button id="add-to-home-btn">Add To Home Screen</button>
         </main>
         <script>
             const infoBtn = document.querySelector("#toggle-info-btn");
             const infoText = document.querySelector("#info");
-            const addHomeBtn = document.querySelector("#add-to-home-btn");
             const saveBtn = document.querySelector("#redirect-btn");
             const titleInput = document.querySelector("#title-input");
             const htmlFile = document.querySelector("#html-file-input");
@@ -247,9 +245,6 @@
                 document.querySelector("main").style.display = "block";
             }
 
-            if (!("share" in window.navigator))
-                addHomeBtn.style.display = "none";
-
             infoBtn.addEventListener("click", handle_infoBtnClick, false);
 
             titleInput.addEventListener("change", handle_titleInput, false);
@@ -267,17 +262,6 @@
                 handle_iconFileSelect,
                 false
             );
-
-            addHomeBtn.addEventListener("click", async function () {
-                navigator
-                    .share({ url: window.location.href })
-                    .then(() => {
-                        console.log("Shared Successfully");
-                    })
-                    .catch((e) => {
-                        console.error("Error: " + e);
-                    });
-            });
 
             saveBtn.onclick = handle_saveButton;
 
