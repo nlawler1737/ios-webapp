@@ -218,6 +218,7 @@
                         "#" +
                         Object.entries(this.#params)
                             .filter((a) => a[1])
+                            .sort((a, b) => b.length - a.length)
                             .map((a) => {
                                 a[1] = encodeURIComponent(a[1]);
                                 return a.join(this.#split_keyvalue);
