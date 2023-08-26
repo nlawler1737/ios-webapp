@@ -186,32 +186,51 @@
             const appleTitleMeta = document.querySelector("#apple-title");
 
             class Params {
-                #params;
+                #params = new Map();
                 #split_entry = "~.~";
                 #split_keyvalue = "~-~";
+                #storage_name = "web-app-data"
+                #storage_keys = [
+                    "base64","background","icon","title"
+                ]
                 constructor(hash) {
-                    this.#params = hash
+                    if (hash) {
+                        const obj = hash
                         ? hash
-                              .replace(/^#/, "")
-                              .split(this.#split_entry)
-                              .map((a) => a.split(this.#split_keyvalue))
-                              .reduce((a, b) => {
-                                  a[b[0]] = decodeURIComponent(b[1]);
-                                  return a;
-                              }, {})
-                        : {};
+                        .replace(/^#/, "")
+                        .split(this.#split_entry)
+                                  .map((a) => a.split(this.#split_keyvalue))
+                                  .reduce((a, b) => {
+                                      a[b[0]] = decodeURIComponent(b[1]);
+                                      return a;
+                                  }, {})
+                            : {};
+                        for (const i in obj) {
+                            this.#params.set(i,obj[i])
+                        }
+                    } else {
+
+                        
+                        for (const i of this.#storage_keys) {
+                            if (!localStorage.getItem(i)) localStorage.setItem(i,"")
+                            this.set(i,localStorage.getItem(i))
+                        }
+                    }
+                    
                     return this;
                 }
                 set(key, value) {
-                    this.#params[key] = value;
-                    window.location.hash = this.hash;
+                    this.#params.set(key,value)
+                    // const data = JSON.parse(localStorage.setItem("web-apps"))
+                    localStorage.setItem(key,value)
+                    // window.location.hash = this.hash;
                     return;
                 }
                 get(key) {
-                    return this.#params[key];
+                    return this.#params.get(key);
                 }
                 get object() {
-                    return { ...this.#params };
+                    // return { ...this.#params };
                 }
                 get hash() {
                     return (
@@ -233,7 +252,7 @@
             displayInformation();
 
             if (
-                "standalone" in window.navigator &&
+                true || "standalone" in window.navigator &&
                 window.navigator.standalone
             ) {
                 const base64 = atob(params.get("base64"));
