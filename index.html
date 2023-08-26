@@ -252,7 +252,7 @@
             displayInformation();
 
             if (
-                true || "standalone" in window.navigator &&
+                "standalone" in window.navigator &&
                 window.navigator.standalone
             ) {
                 const base64 = atob(params.get("base64"));
