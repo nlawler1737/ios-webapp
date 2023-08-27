@@ -104,7 +104,7 @@
                         loaded html
                     </div>
                     <div>* pasted html will be converted to base64</div>
-                    <div style="text-align: right">v 2.1.1</div>
+                    <div style="text-align: right">v 2.1.2</div>
                 </small>
             </div>
             <div class="input-group">
@@ -269,7 +269,7 @@
             displayInformation();
 
             if (
-                false || "standalone" in window.navigator &&
+                (false || "standalone" in window.navigator || localStorage.getItem("dev")) &&
                 window.navigator.standalone && localStorage.getItem("ready") === "true"
             ) {
                 const base64 = atob(params.get("base64"));
