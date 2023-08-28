@@ -104,7 +104,7 @@
                         loaded html
                     </div>
                     <div>* pasted html will be converted to base64</div>
-                    <div style="text-align: right">v 2.1.3</div>
+                    <div style="text-align: right">v 2.1.4</div>
                 </small>
             </div>
             <div class="input-group">
@@ -192,7 +192,7 @@
                 #storage_name = "web-app-data";
                 #storage_keys = ["base64", "background", "icon", "title"];
                 constructor(hash) {
-                    if (hash) {
+                    if (hash && !this.#anyKeyExists()) {
                         const obj = hash
                             ? hash
                                   .replace(/^#/, "")
@@ -204,7 +204,7 @@
                                   }, {})
                             : {};
                         for (const i in obj) {
-                            this.#params.set(i, obj[i]);
+                            // this.#params.set(i, obj[i]);
                             this.set(i, obj[i]);
                         }
                     } else {
@@ -249,6 +249,11 @@
                         return localStorage.getItem(key);
                     });
                     localStorage.setItem("ready", ready);
+                }
+                #anyKeyExists() {
+                    return this.#storage_keys.some(key=>{
+                        return localStorage.getItem(key) !== null
+                    })
                 }
             }
 
