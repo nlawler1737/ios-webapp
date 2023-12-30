@@ -1,447 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Web App Creator</title>
-        <meta http-equiv="content-Type" content="text/html; charset=utf-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="rgb(50, 50, 50)" />
-        <meta
-            name="viewport"
-            content="width=320, initial-scale=1,user-scaleable=no"
-        />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <link id="apple-icon" rel="apple-touch-icon" sizes="180x180" href="" />
-        <meta
-            id="apple-title"
-            name="apple-mobile-web-app-title"
-            content="My Web App"
-        />
-        <style>
-            * {
-                font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-                    "Helvetica Neue", sans-serif;
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                display: flex;
-                justify-content: center;
-            }
-            main {
-                background-color: #ffffff57;
-                width: max-content;
-                padding: 10px;
-                display: none;
-            }
-            #info {
-                border: 1px solid;
-            }
-            #base64-input {
-                resize: none;
-                border-radius: 5px;
-                border: transparent;
-                outline: transparent;
-            }
-            #appIcon {
-                max-width: 150px;
-                max-height: 150px;
-            }
-            #appIcon[src=""] {
-                display: none;
-            }
-            label > small {
-                font-weight: initial;
-                margin-left: 10px;
-            }
-            label {
-                font-weight: 600;
-            }
-            input[type="text"],
-            input[type="url"] {
-                border-radius: 5px;
-                border: 1px solid grey;
-                outline: transparent;
-            }
-            .center-text {
-                text-align: center;
-            }
-            .w-100 {
-                display: block;
-                width: 100%;
-            }
-            .input-group {
-                margin: 10px 0 10px 0;
-            }
-            .hidden {
-                display: none;
-            }
-        </style>
-    </head>
-    <body>
-        <main>
-            <h1 class="center-text">IOS Web App Creator</h1>
-            <span class="w-100 center-text"
-                ><button id="toggle-info-btn">Show Info</button></span
-            >
-            <div id="info" class="w-10 hidden" style="padding: 5px">
-                <strong class="w-100 center-text"
-                    >Allows Custom HTML Apps On Home Screen</strong
-                >
-                <ul>
-                    <li>Fill out fields</li>
-                    <li>Share Website</li>
-                    <li>Click "Add to Home Screen"</li>
-                </ul>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-                <small>
-                    <div>
-                        * background color should be the background color of
-                        loaded html
-                    </div>
-                    <div>* pasted html will be converted to base64</div>
-                    <div style="text-align: right">v 2.1.4</div>
-                </small>
-            </div>
-            <div class="input-group">
-                <label for="title-input" id="title-label" class="w-100"
-                    >App Name</label
-                >
-                <input
-                    type="text"
-                    id="title-input"
-                    name="title-input"
-                    placeholder="App Name"
-                    value="My Web App"
-                />
-            </div>
-            <div class="input-group">
-                <label id="base64-label" class="w-100" for="html-file-input"
-                    >HTML<small
-                        >from file or paste HTML / base64 HTML</small
-                    ></label
-                >
-                <input
-                    id="html-file-input"
-                    type="file"
-                    name="html-file-input"
-                    accept=".html"
-                />
-                <textarea
-                    id="base64-input"
-                    class="w-100"
-                    type="text"
-                    placeholder="Base64 / HTML"
-                    name="base64-input"
-                ></textarea>
-            </div>
-            <div>
-                <label class="w-100" for="color-input">Background Color</label>
-                <input
-                    class=""
-                    type="color"
-                    id="color-input"
-                    name="color-input"
-                />
-            </div>
-            <div class="input-group">
-                <label class="w-100" for="appIcon-input"
-                    >App Icon<small>from file or link</small></label
-                >
-                <div>
-                    <input
-                        type="file"
-                        name="appIcon-input"
-                        id="appIcon-input"
-                    />
-                    <input
-                        type="url"
-                        class="w-100"
-                        name=""
-                        id="appIcon-url"
-                        placeholder="Image URL"
-                        value="https://apple.com/favicon.ico"
-                    />
-                </div>
-                <img id="appIcon" src="" />
-            </div>
-            <button id="redirect-btn">Save</button>
-        </main>
-        <script>
-            const infoBtn = document.querySelector("#toggle-info-btn");
-            const infoText = document.querySelector("#info");
-            const saveBtn = document.querySelector("#redirect-btn");
-            const titleInput = document.querySelector("#title-input");
-            const htmlFile = document.querySelector("#html-file-input");
-            const base64Input = document.querySelector("#base64-input");
-            const colorInput = document.querySelector("#color-input");
-            const appIconUrl = document.querySelector("#appIcon-url");
-            const appIconFile = document.querySelector("#appIcon-input");
-            const appIconImg = document.querySelector("#appIcon");
-            const appleIconMeta = document.querySelector("#apple-icon");
-            const appleTitleMeta = document.querySelector("#apple-title");
+    <meta
+      id="apple-title-meta"
+      name="apple-mobile-web-app-title"
+      content="My Web App"
+    />
+    <meta http-equiv="content-Type" content="text/html; charset=utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="white" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link id="apple-icon-meta" rel="apple-touch-icon" sizes="180x180" href="" />
 
-            class Params {
-                #params = new Map();
-                #split_entry = "~.~";
-                #split_keyvalue = "~-~";
-                #storage_name = "web-app-data";
-                #storage_keys = ["base64", "background", "icon", "title"];
-                constructor(hash) {
-                    if (hash && !this.#anyKeyExists()) {
-                        const obj = hash
-                            ? hash
-                                  .replace(/^#/, "")
-                                  .split(this.#split_entry)
-                                  .map((a) => a.split(this.#split_keyvalue))
-                                  .reduce((a, b) => {
-                                      a[b[0]] = decodeURIComponent(b[1]);
-                                      return a;
-                                  }, {})
-                            : {};
-                        for (const i in obj) {
-                            // this.#params.set(i, obj[i]);
-                            this.set(i, obj[i]);
-                        }
-                    } else {
-                        for (const i of this.#storage_keys) {
-                            if (!localStorage.getItem(i))
-                                localStorage.setItem(i, "");
-                            this.set(i, localStorage.getItem(i));
-                        }
-                    }
+    <title>Web App Creator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <div id="content">
+        <h2 class="center-text">iOS Web App Creator</h2>
 
-                    return this;
-                }
-                set(key, value) {
-                    this.#params.set(key, value);
-                    // const data = JSON.parse(localStorage.setItem("web-apps"))
-                    localStorage.setItem(key, value);
-                    // this.checkReady()
-                    // window.location.hash = this.hash;
-                    return;
-                }
-                get(key) {
-                    return this.#params.get(key);
-                }
-                get object() {
-                    // return { ...this.#params };
-                }
-                get hash() {
-                    return (
-                        "#" +
-                        Object.entries(this.#params)
-                            .filter((a) => a[1])
-                            .sort((a, b) => b.length - a.length)
-                            .map((a) => {
-                                a[1] = encodeURIComponent(a[1]);
-                                return a.join(this.#split_keyvalue);
-                            })
-                            .join(this.#split_entry)
-                    );
-                }
-                checkReady() {
-                    const ready = this.#storage_keys.every((key) => {
-                        return localStorage.getItem(key);
-                    });
-                    localStorage.setItem("ready", ready);
-                }
-                #anyKeyExists() {
-                    return this.#storage_keys.some(key=>{
-                        return localStorage.getItem(key) !== null
-                    })
-                }
-            }
+        <div class="input-group">
+          <label for="title-input" id="title-label" class="w-100"
+            >App Name<small class="status hidden">Invalid Input</small></label
+          >
+          <input
+            type="text"
+            id="title-input"
+            name="title-input"
+            placeholder="My Web App"
+          />
+        </div>
 
-            const params = new Params(window.location.hash);
+        <div class="input-group">
+          <label id="color-label" class="w-100" for="color-input"
+            >Background Color<small class="status hidden">Invalid Input</small></label
+          >
+          <input class="" type="color" id="color-input" name="color-input" />
+        </div>
 
-            setTimeout(() => {
-                window.ontouchstart = function (e) {
-                    if (e.touches.length === 5) {
-                        window.localStorage.setItem("ready", false);
-                        window.location.reload();
-                    }
-                };
-            }, 1000);
+        <div class="input-group">
+          <label id="icon-label" class="w-100" for="appIcon-input">App Icon<small class="status hidden">Invalid Input</small></label>
+          <div class="two-input">
+            <input
+              type="url"
+              class="w-100"
+              name=""
+              id="app-icon-url-input"
+              placeholder="Image URL"
+            />
+            <input type="file" name="appIcon-input" id="appIcon-input" />
+            <label for="appIcon-input">Open Image</label>
+          </div>
+        </div>
 
-            displayInformation();
+        <div class="input-group">
+          <label id="base64-label" class="w-100" for="base64-input">HTML<small class="status hidden">Invalid Input</small></label>
+          <div class="two-input">
+            <textarea
+              id="base64-input"
+              class="w-100"
+              type="text"
+              placeholder="Base64 encoded HTML"
+              name="base64-input"
+            ></textarea>
 
-            if (
-                (false ||
-                    localStorage.getItem("dev") === "true" ||
-                    ("standalone" in window.navigator &&
-                        window.navigator.standalone)) &&
-                localStorage.getItem("ready") === "true"
-            ) {
-                const base64 = atob(params.get("base64"));
-                window.onload = function () {
-                    document.open();
-                    document.write(base64);
-                    document.close();
-                };
-            } else {
-                document.querySelector("main").style.display = "block";
-            }
+            <input
+              id="html-file-input"
+              type="file"
+              name="html-file-input"
+              accept=".html"
+            />
+            <label for="html-file-input">Open File</label>
+          </div>
+        </div>
 
-            infoBtn.addEventListener("click", handle_infoBtnClick, false);
+        <button id="redirect-btn">Save</button>
 
-            titleInput.addEventListener("change", handle_titleInput, false);
-
-            htmlFile.addEventListener("change", handle_htmlFileSelect, false);
-
-            base64Input.addEventListener("change", handle_base64Input, false);
-
-            colorInput.addEventListener("change", handle_colorInput, false);
-
-            appIconUrl.addEventListener("change", handle_urlInput, false);
-
-            appIconFile.addEventListener(
-                "change",
-                handle_iconFileSelect,
-                false
-            );
-
-            saveBtn.onclick = handle_saveButton;
-
-            function displayInformation() {
-                const base64 = params.get("base64");
-                const background = params.get("background");
-                const icon = params.get("icon");
-                const title = params.get("title");
-
-                update_base64(base64);
-
-                update_background(background);
-
-                update_icon(icon);
-
-                update_title(title);
-            }
-
-            function update_background(background) {
-                const color = colorInput.value;
-
-                colorInput.value = background || color;
-                document.body.style.background = background || color;
-                document
-                    .querySelector("[name='theme-color']")
-                    .setAttribute("content", background || color);
-            }
-
-            function update_title(title) {
-                if (!title) return;
-                titleInput.value = title;
-                appleTitleMeta.setAttribute("content", title);
-            }
-
-            function update_url() {
-                window.location.hash = params.hash;
-            }
-
-            function update_icon(icon) {
-                appIconImg.src = icon ? icon : "";
-                appIconUrl.value = icon?.match(/^https?/) ? icon : "";
-                appleIconMeta.href = icon;
-            }
-
-            function update_base64(base64) {
-                base64Input.value = base64 || "";
-            }
-
-            function handle_infoBtnClick(event) {
-                const isHidden = infoText.classList.contains("hidden");
-
-                if (isHidden) {
-                    infoText.classList.remove("hidden");
-                    infoBtn.innerText = "Hide Info";
-                    return;
-                }
-                infoText.classList.add("hidden");
-                infoBtn.innerText = "Show Info";
-            }
-
-            function handle_colorInput(event) {
-                params.set("background", colorInput.value);
-                update_background(colorInput.value);
-            }
-
-            function handle_titleInput(event) {
-                params.set("title", titleInput.value);
-                update_title(titleInput.value);
-            }
-
-            function handle_base64Input(event) {
-                const base64 = isBase64(base64Input.value)
-                    ? base64Input.value
-                    : btoa(base64Input.value);
-                params.set("base64", base64);
-                update_base64(base64);
-            }
-
-            function handle_htmlFileSelect(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.readAsText(file, "utf-8");
-                    reader.onload = function (a) {
-                        const text = a.target.result.trim();
-                        const base64 = btoa(text);
-                        params.set("base64", base64);
-                        update_base64(base64);
-                    };
-                }
-            }
-
-            function handle_urlInput(event) {
-                params.set("icon", appIconUrl.value);
-                update_icon(appIconUrl.value);
-            }
-
-            function handle_saveButton(event) {
-                if (!base64Input.value) return;
-                displayInformation();
-                params.checkReady();
-                window.location.reload();
-            }
-
-            function handle_iconFileSelect(event) {
-                const selectedFile = event.target.files[0];
-
-                if (selectedFile) {
-                    const reader = new FileReader();
-
-                    reader.onload = function (event) {
-                        const img = new Image();
-                        const src = event.target.result;
-
-                        img.src = src;
-                        img.onload = function () {
-                            const { width, height } = img;
-                            if (width > 200 || height > 200) {
-                                alert(
-                                    "Image must be 200x200 pixels or less. Or use a URL"
-                                );
-                                return;
-                            }
-                            params.set("icon", src);
-                            update_icon(src);
-                        };
-                    };
-
-                    reader.readAsDataURL(selectedFile);
-                }
-            }
-
-            function isBase64(text) {
-                if (text === "") return false;
-                const regex =
-                    /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$/;
-                return regex.test(text);
-            }
-        </script>
-    </body>
+        <div class="app-icon-preview-container">
+          <div class="app-icon-preview-background">
+            <img id="app-icon-preview" src="" />
+            <div id="app-title-preview">Podcasts</div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="./js/WebApp.js"></script>
+    <script src="./js/StatusElement.js"></script>
+    <script src="./script.js"></script>
+  </body>
 </html>
