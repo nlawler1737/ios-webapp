@@ -36,11 +36,20 @@ class WebApp {
   //       .join(this.#split_entry)
   //   );
   // }
-  checkReady() {
-    const ready = this.#storage_keys.every((key) => {
+  checkStandaloneReady() {
+    const ready = ["base64", "background"].every((key) => {
       return localStorage.getItem(key);
     });
     localStorage.setItem("ready", ready);
+    return ready
+    // localStorage.setItem("ready", true);
+  }
+  checkSetupReady() {
+    const ready = ["icon", "title"].every((key) => {
+      return localStorage.getItem(key);
+    });
+    localStorage.setItem("ready", ready);
+    return ready
   }
   // #anyKeyExists() {
   //   return this.#storage_keys.some((key) => {

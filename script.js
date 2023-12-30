@@ -1,4 +1,5 @@
-// const infoBtn = document.querySelector("#toggle-info-btn");
+// window.navigator.standalone = true;
+
 const appTitleStatus = new StatusElement(
   document.querySelector("#title-label > small")
 );
@@ -12,26 +13,42 @@ const appBase64Status = new StatusElement(
   document.querySelector("#base64-label > small")
 );
 
-const infoText = document.querySelector("#info");
-const saveBtn = document.querySelector("#redirect-btn");
+const shareStatus = new StatusElement(
+  document.querySelector("#share-instructions")
+);
+
 const titleInput = document.querySelector("#title-input");
-const htmlFile = document.querySelector("#html-file-input");
-const base64Input = document.querySelector("#base64-input");
 const colorInput = document.querySelector("#color-input");
-const appIconUrl = document.querySelector("#app-icon-url-input");
-const appIconFile = document.querySelector("#appIcon-input");
-const appIconImg = document.querySelector("#app-icon-preview");
+const iconInput = document.querySelector("#app-icon-url-input");
+const base64Input = document.querySelector("#base64-input");
+const htmlFileInput = document.querySelector("#html-file-input");
+const iconFileInput = document.querySelector("#appIcon-input");
+
+const saveBtn = document.querySelector("#redirect-btn");
+
+const appPreviewIcon = document.querySelector("#app-icon-preview");
+const appPreviewTitle = document.querySelector("#app-title-preview");
+
 const appleIconMeta = document.querySelector("#apple-icon-meta");
 const appleTitleMeta = document.querySelector("#apple-title-meta");
-const appPreviewTitle = document.querySelector("#app-title-preview");
 
 const webApp = new WebApp();
 
-setTimeout(onUserHtmlLoaded,1000)
+const isStandalone =
+  "standalone" in window.navigator && window.navigator.standalone;
+
+setTimeout(onUserHtmlLoaded, 1000);
 
 displayInformation();
 
-window.navigator.standalone = true;
+
+if (isStandalone) {
+  toggleHiddenElement(titleInput.parentElement, false);
+  toggleHiddenElement(iconInput.parentElement.parentElement, false);
+} else {
+  toggleHiddenElement(colorInput.parentElement, false);
+  toggleHiddenElement(base64Input.parentElement.parentElement, false);
+}
 
 if (
   (localStorage.getItem("dev") === "true" ||
@@ -50,17 +67,17 @@ if (
 
 titleInput.addEventListener("change", handleTitleInput, false);
 
-htmlFile.addEventListener("change", handleHtmlFileSelect, false);
+htmlFileInput.addEventListener("change", handleHtmlFileSelect, false);
 
 base64Input.addEventListener("change", handleBase64Input, false);
 
 colorInput.addEventListener("change", handleColorInput, false);
 
-appIconUrl.addEventListener("change", handleUrlInput, false);
+iconInput.addEventListener("change", handleUrlInput, false);
 
-appIconFile.addEventListener("change", handleIconFileSelect, false);
+iconFileInput.addEventListener("change", handleIconFileSelect, false);
 
-saveBtn.onclick = handleSaveButton;
+saveBtn.addEventListener("click", handleSaveButton);
 
 function onUserHtmlLoaded() {
   function pageClicked() {
@@ -127,11 +144,11 @@ function updateBackground(background) {
 }
 
 function updateIcon(icon) {
-  appIconImg.src = icon ? icon : "";
-  const urlMatch = icon?.match(/^https?/)
-  appIconUrl.value = urlMatch ? icon : "";
+  appPreviewIcon.src = icon ? icon : "";
+  const urlMatch = icon?.match(/^https?/);
+  iconInput.value = urlMatch ? icon : "";
   appleIconMeta.href = icon;
-  return !!urlMatch
+  return !!urlMatch;
 }
 
 function updateBase64(base64) {
@@ -149,8 +166,8 @@ function handleColorInput(event) {
 }
 
 function handleUrlInput(event) {
-  const status = updateIcon(appIconUrl.value);
-  webApp.set("icon", appIconUrl.value);
+  const status = updateIcon(iconInput.value);
+  webApp.set("icon", iconInput.value);
   if (!status) {
     appIconStatus.error("Invalid").show();
     return;
@@ -161,7 +178,6 @@ function handleBase64Input(event) {
   const base64 = isBase64(base64Input.value)
     ? base64Input.value
     : btoa(base64Input.value);
-  // console.log(base64)
   webApp.set("base64", base64);
   updateBase64(base64);
 }
@@ -181,58 +197,68 @@ function handleHtmlFileSelect(event) {
 }
 
 function handleSaveButton(event) {
-  if (!webApp.get("title")) {
-    appTitleStatus.error("Invalid").show();
-    return;
+  if (isStandalone) {
+    if (!webApp.get("background")) {
+      appColorStatus.error("Select Color").show();
+      return;
+    } else {
+      appColorStatus.success("✓").show();
+    }
+
+    if (!webApp.get("base64")) {
+      appBase64Status.error("Invalid").show();
+      return;
+    } else {
+      appBase64Status.success("✓").show();
+    }
+    if (!webApp.checkStandaloneReady()) {
+      shareStatus.error("Missing Fields").show()
+      return
+    } else {
+      shareStatus.show(false)
+    }
+    window.location.reload();
   } else {
-    appTitleStatus.success("✓").show();
-  }
-  if (!webApp.get("background")) {
-    appColorStatus.error("Select Color").show();
-    return;
-  } else {
-    appColorStatus.success("✓").show();
-  }
-  if (!webApp.get("icon")) {
-    appIconStatus.error("Invalid").show();
-    return;
-  } else {
-    appIconStatus.success("✓").show();
-  }
-  if (!webApp.get("base64")) {
-    appBase64Status.error("Invalid").show();
-    return
-  } else {
-    appBase64Status.success("✓").show();
+    if (!webApp.get("title")) {
+      appTitleStatus.error("Invalid").show();
+      return;
+    } else {
+      appTitleStatus.success("✓").show();
+    }
+    if (!webApp.get("icon")) {
+      appIconStatus.error("Invalid").show();
+      return;
+    } else {
+      appIconStatus.success("✓").show();
+    }
+    if (!webApp.checkStandaloneReady()) {
+      shareStatus.error("Missing Fields").show()
+    } else {
+      shareStatus.show();
+    }
   }
   displayInformation();
-  webApp.checkReady();
-  window.location.reload();
+  webApp.checkStandaloneReady();
 }
 
 function handleIconFileSelect(event) {
   const selectedFile = event.target.files[0];
 
   if (selectedFile) {
+    if (selectedFile.size > 2e6) {
+      alert("Image Too Large. Image must be 2mb or less. Or use a URL");
+      return;
+    }
+
     const reader = new FileReader();
 
-    reader.onload = function (event) {
-      const img = new Image();
-      const src = event.target.result;
-
-      img.src = src;
-      img.onload = function () {
-        const { width, height } = img;
-        if (width > 200 || height > 200) {
-          alert("Image must be 200x200 pixels or less. Or use a URL");
-          return;
-        }
-        webApp.set("icon", src);
-        updateIcon(src);
-      };
-    };
-
     reader.readAsDataURL(selectedFile);
+
+    reader.onload = function (event) {
+      const src = event.target.result;
+      webApp.set("icon", src);
+      updateIcon(src);
+    };
   }
 }
 

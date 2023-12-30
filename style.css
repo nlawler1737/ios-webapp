@@ -39,12 +39,12 @@ body {
 #app-icon-preview {
   width: 100px;
   height: 100px;
+  min-width: 100px;
+  min-height: 100px;
   border-radius: 20%;
   background-color: black;
-}
-
-#app-icon-preview[src=""] {
-  /* background-image: linear-gradient(to left, red, blue); */
+  object-fit: cover;
+  object-position: center top;
 }
 
 #redirect-btn {
