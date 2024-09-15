@@ -23,8 +23,10 @@ const iconInput = document.querySelector("#app-icon-url-input");
 const base64Input = document.querySelector("#base64-input");
 const htmlFileInput = document.querySelector("#html-file-input");
 const iconFileInput = document.querySelector("#appIcon-input");
+const fromHtmlInput = document.querySelector("#from-html-input");
 
 const saveBtn = document.querySelector("#redirect-btn");
+const loadHtmlBtn = document.querySelector("#load-html-button");
 
 const appPreviewIcon = document.querySelector("#app-icon-preview");
 const appPreviewTitle = document.querySelector("#app-title-preview");
@@ -41,10 +43,10 @@ setTimeout(onUserHtmlLoaded, 1000);
 
 displayInformation();
 
-
 if (isStandalone) {
   toggleHiddenElement(titleInput.parentElement, false);
   toggleHiddenElement(iconInput.parentElement.parentElement, false);
+  toggleHiddenElement(fromHtmlInput.parentElement.parentElement, false);
 } else {
   toggleHiddenElement(colorInput.parentElement, false);
   toggleHiddenElement(base64Input.parentElement.parentElement, false);
@@ -78,6 +80,27 @@ iconInput.addEventListener("change", handleUrlInput, false);
 iconFileInput.addEventListener("change", handleIconFileSelect, false);
 
 saveBtn.addEventListener("click", handleSaveButton);
+
+loadHtmlBtn.addEventListener("click", handleLoadHtmlButton);
+
+function handleLoadHtmlButton() {
+  if (!fromHtmlInput.value) {
+    fromHtmlInput.style.border = "1px solid red";
+    return;
+  }
+  fromHtmlInput.style.border = null;
+
+  const dom = domFromString(fromHtmlInput.value);
+
+  const title = dom.querySelector("title").innerText;
+  const icon = getAppIconFromDOM(dom);
+
+  titleInput.value = title;
+  iconInput.value = icon;
+
+  titleInput.dispatchEvent(new Event("change"));
+  iconInput.dispatchEvent(new Event("change"));
+}
 
 function onUserHtmlLoaded() {
   function pageClicked() {
@@ -175,9 +198,7 @@ function handleUrlInput(event) {
 }
 
 function handleBase64Input(event) {
-  const base64 = isBase64(base64Input.value)
-    ? base64Input.value
-    : btoa(base64Input.value);
+  const base64 = btoa(htmlFromString(base64Input.value));
   webApp.set("base64", base64);
   updateBase64(base64);
 }
@@ -212,10 +233,10 @@ function handleSaveButton(event) {
       appBase64Status.success("✓").show();
     }
     if (!webApp.checkStandaloneReady()) {
-      shareStatus.error("Missing Fields").show()
-      return
+      shareStatus.error("Missing Fields").show();
+      return;
     } else {
-      shareStatus.show(false)
+      shareStatus.show(false);
     }
     window.location.reload();
   } else {
@@ -232,7 +253,7 @@ function handleSaveButton(event) {
       appIconStatus.success("✓").show();
     }
     if (!webApp.checkStandaloneReady()) {
-      shareStatus.error("Missing Fields").show()
+      shareStatus.error("Missing Fields").show();
     } else {
       shareStatus.show();
     }
@@ -294,4 +315,42 @@ function toggleHiddenElement(element, shownBool = null) {
     return;
   }
   element.classList.toggle("hidden");
+}
+
+/**
+ * parses a string into a DOM
+ * @param {string} string
+ * @returns {Document}
+ */
+function domFromString(string) {
+  const str = htmlFromString(string);
+  const parser = new DOMParser();
+  return parser.parseFromString(str, "text/html");
+}
+
+function getAppIconFromDOM(dom) {
+  const el =
+    dom.head.querySelector("link[rel=apple-touch-icon-precomposed]") ||
+    dom.head.querySelector("link[rel=apple-touch-icon]") ||
+    dom.head.querySelector("link[rel=icon]");
+  if (el) {
+    return el.href;
+  }
+  return "";
+}
+
+function htmlFromString(string) {
+  let str = "";
+  try {
+    str = atob(string);
+  } catch (e) {
+    if (string.startsWith("data:text/html;base64,")) {
+      str = atob(string.slice(22));
+    } else if (string.startsWith("data:text/html,")) {
+      str = string.slice(15);
+    } else {
+      str = string;
+    }
+  }
+  return str;
 }

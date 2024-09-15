@@ -27,6 +27,27 @@
         <h2 class="center-text">iOS Web App Creator</h2>
 
         <div class="input-group">
+          <label for="from-html-input" id="from-html-label" class="w-100"
+            >From HTML</label
+          >
+          <div class="two-input">
+            <input
+              type="text"
+              id="from-html-input"
+              name="from-html-input"
+              placeholder="data URI, base64, or html"
+            />
+            <button
+              id="load-html-button"
+              class="rounded-input"
+              style="background: white; max-width: 100px"
+            >
+              Load
+            </button>
+          </div>
+        </div>
+
+        <div class="input-group">
           <label for="title-input" id="title-label" class="w-100"
             >App Name<small class="status hidden">Invalid Input</small></label
           >
@@ -40,13 +61,17 @@
 
         <div class="input-group">
           <label id="color-label" class="w-100" for="color-input"
-            >Background Color<small class="status hidden">Invalid Input</small></label
+            >Background Color<small class="status hidden"
+              >Invalid Input</small
+            ></label
           >
           <input class="" type="color" id="color-input" name="color-input" />
         </div>
 
         <div class="input-group">
-          <label id="icon-label" class="w-100" for="appIcon-input">App Icon<small class="status hidden">Invalid Input</small></label>
+          <label id="icon-label" class="w-100" for="appIcon-input"
+            >App Icon<small class="status hidden">Invalid Input</small></label
+          >
           <div class="two-input">
             <input
               type="url"
@@ -61,13 +86,15 @@
         </div>
 
         <div class="input-group">
-          <label id="base64-label" class="w-100" for="base64-input">HTML<small class="status hidden">Invalid Input</small></label>
+          <label id="base64-label" class="w-100" for="base64-input"
+            >HTML<small class="status hidden">Invalid Input</small></label
+          >
           <div class="two-input">
             <textarea
               id="base64-input"
               class="w-100"
               type="text"
-              placeholder="Base64 encoded HTML"
+              placeholder="data URI, base64, or html"
               name="base64-input"
             ></textarea>
 
@@ -82,11 +109,13 @@
         </div>
 
         <button id="redirect-btn">Save</button>
-        <small id="share-instructions" class="small status success hidden">Press share then add to home screen</small>
+        <small id="share-instructions" class="small status success hidden"
+          >Press share then add to home screen</small
+        >
 
         <div class="app-icon-preview-container">
           <div class="app-icon-preview-background">
-            <img id="app-icon-preview" src=""/>
+            <img id="app-icon-preview" src="" />
             <div id="app-title-preview">My Web App</div>
           </div>
         </div>
