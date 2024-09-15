@@ -252,7 +252,7 @@ function handleSaveButton(event) {
     } else {
       appIconStatus.success("✓").show();
     }
-    if (!webApp.checkStandaloneReady()) {
+    if (!webApp.checkSetupReady()) {
       shareStatus.error("Missing Fields").show();
     } else {
       shareStatus.show();
